@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: cartresq-backend
+    env: node
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: NODE_ENV
+        value: production
+      - key: EMAIL_SERVICE
+        sync: false
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+    plan: free
+    autoDeploy: true
+
+  - type: worker
+    name: cartresq-email-worker
+    env: node
+    buildCommand: cd backend && npm install
+    startCommand: cd backend/worker && npm install && npm start
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: NODE_ENV
+        value: production
+      - key: EMAIL_SERVICE
+        sync: false
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+    plan: free
+    autoDeploy: true 

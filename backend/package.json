@@ -1,0 +1,39 @@
+{
+  "name": "cartresq-backend",
+  "version": "1.0.0",
+  "description": "Backend for CartResQ - Abandoned Cart Recovery System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "worker": "node worker.js",
+    "test-scheduler": "node test-scheduler-offline.js",
+    "test-scheduler-full": "node test-email-scheduler.js",
+    "test-email": "node test-email-sending.js",
+    "test-manual-email": "node test-manual-email.js",
+    "check-env": "node check-env.js",
+    "cleanup-notifications": "node cleanup-notifications.js"
+  },
+  "dependencies": {
+    "@shopify/shopify-api": "^11.12.0",
+    "@woocommerce/woocommerce-rest-api": "^1.0.1",
+    "agenda": "^5.0.0",
+    "axios": "^1.11.0",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.16.0",
+    "mongoose": "^8.14.1",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.7",
+    "sib-api-v3-sdk": "^8.5.0",
+    "socket.io": "^4.8.1",
+    "stripe": "^14.25.0",
+    "twilio": "^5.6.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

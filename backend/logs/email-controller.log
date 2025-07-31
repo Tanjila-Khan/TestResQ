@@ -1,0 +1,18 @@
+[2025-07-21T08:22:35.525Z] Received discount offer email request: {"to":"t_e631d81f29a069b1c27917d73483d9","storeUrl":"http://jexla.net/Shop","discountCode":"CARTYDB31N","discountAmount":50,"discountType":"percentage"}
+[2025-07-21T08:22:35.774Z] Attempting to send email to heyameh1508@gmail.com with coupon CARTYDB31N
+[2025-07-21T08:22:40.767Z] Email sent successfully to heyameh1508@gmail.com. Message ID: <fadc1abb-6659-008d-3c0a-bc6e3aa66391@cartresq.com>
+[2025-07-21T08:26:41.434Z] Received discount offer email request: {"to":"t_3064e1c79662d4895d0dbf315ed44f","storeUrl":"http://jexla.net/Shop","discountCode":"CARTYDB31N","discountAmount":50,"discountType":"percentage"}
+[2025-07-21T08:26:41.683Z] Attempting to send email to heyameh1508@gmail.com with coupon CARTYDB31N
+[2025-07-21T08:26:50.310Z] Email sent successfully to heyameh1508@gmail.com. Message ID: <56ca9d5c-3e3a-e743-f13f-76c6c518c1d9@cartresq.com>
+[2025-07-21T09:01:11.897Z] Received discount offer email request: {"to":"t_e631d81f29a069b1c27917d73483d9","storeUrl":"http://jexla.net/Shop","discountCode":"CARTYDB31N","discountAmount":50,"discountType":"percentage"}
+[2025-07-21T09:01:12.158Z] Attempting to send email to heyameh1508@gmail.com with coupon CARTYDB31N
+[2025-07-21T09:01:16.629Z] Email sent successfully to heyameh1508@gmail.com. Message ID: <e09b3a58-ec43-7677-ec0c-4344fcc0a5d0@cartresq.com>
+[2025-07-28T13:00:28.340Z] Received discount offer email request: {"to":"1","storeUrl":"http://jexla.net/Shop","discountCode":"CARTDV8TTS","discountAmount":80,"discountType":"percentage"}
+[2025-07-28T13:00:28.602Z] Attempting to send email to mohammad.shajalal@gmail.com with coupon CARTDV8TTS
+[2025-07-28T13:00:36.601Z] Received discount offer email request: {"to":"1","storeUrl":"http://jexla.net/Shop","discountCode":"CARTDV8TTS","discountAmount":80,"discountType":"percentage"}
+[2025-07-28T13:00:36.840Z] Attempting to send email to mohammad.shajalal@gmail.com with coupon CARTDV8TTS
+[2025-07-28T13:00:39.723Z] Email sent successfully to mohammad.shajalal@gmail.com. Message ID: <640eec83-d933-6aa8-03a9-c5629d6676fd@cartresq.com>
+[2025-07-28T13:00:43.667Z] Email sent successfully to mohammad.shajalal@gmail.com. Message ID: <32974518-2faf-0eff-fd53-609a19ffa4c7@cartresq.com>
+[2025-07-29T08:34:29.853Z] Received discount offer email request: {"to":"i.tanjila.khan@gmail.com","storeUrl":"http://jexla.net/Shop","discountCode":"CARTDV8TTS","discountAmount":80,"discountType":"percentage"}
+[2025-07-29T08:34:30.173Z] Attempting to send email to i.tanjila.khan@gmail.com with coupon CARTDV8TTS
+[2025-07-29T08:34:34.658Z] Email sent successfully to i.tanjila.khan@gmail.com. Message ID: <9167c4ed-c1f6-be81-95b8-9a63d675a16a@cartresq.com>
