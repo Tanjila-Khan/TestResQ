@@ -16,6 +16,7 @@ import Coupons from './components/coupons/Coupons';
 import Analytics from './components/analytics/Analytics';
 import Settings from './components/settings/Settings';
 import DashboardLayout from './components/layout/DashboardLayout';
+import NotFound from './components/NotFound';
 import './App.css';
 import api from './utils/api';
 
@@ -83,10 +84,35 @@ function useAuthState() {
 
 function SmartRedirect() {
   const { authChecked, isAuthenticated, isSubscribed, isStoreConnected } = useAuthState();
-  if (!authChecked) return null;
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (!isSubscribed) return <Navigate to="/pricing" replace />;
-  if (!isStoreConnected) return <Navigate to="/store-setup" replace />;
+  const location = useLocation();
+  
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // If not authenticated, redirect to login
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  // If authenticated but not subscribed, redirect to pricing
+  if (!isSubscribed) {
+    return <Navigate to="/pricing" replace />;
+  }
+  
+  // If authenticated and subscribed but not store connected, redirect to store setup
+  if (!isStoreConnected) {
+    return <Navigate to="/store-setup" replace />;
+  }
+  
+  // If all conditions are met, redirect to dashboard
   return <Navigate to="/dashboard" replace />;
 }
 
@@ -160,7 +186,7 @@ function App() {
           </Route>
 
           <Route path="/" element={<SmartRedirect />} />
-          <Route path="*" element={<SmartRedirect />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </Router>
