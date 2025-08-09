@@ -1,6 +1,6 @@
 const config = {
-  apiBaseUrl: process.env.REACT_APP_API_URL || 'http://localhost:3003',
-  wsUrl: process.env.REACT_APP_WS_URL || 'ws://localhost:3003'
+  apiBaseUrl: process.env.REACT_APP_API_URL || 'https://testresq.onrender.com',
+  wsUrl: process.env.REACT_APP_WS_URL || 'wss://testresq.onrender.com'
 };
 
 export default config; 
