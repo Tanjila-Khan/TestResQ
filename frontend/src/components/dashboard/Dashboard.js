@@ -230,6 +230,7 @@ const Dashboard = () => {
 
   // Show loading while checking subscription
   if (loading) {
+    console.log('Dashboard: Showing loading state');
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -242,6 +243,7 @@ const Dashboard = () => {
 
   // Show subscription required message if not subscribed
   if (subscription.status !== 'active' && subscription.status !== 'trialing') {
+    console.log('Dashboard: Showing subscription required state', { subscription });
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6 text-center">
@@ -262,6 +264,7 @@ const Dashboard = () => {
 
   // Show store connection error message
   if (error && (error.includes('Store connection failed') || error.includes('Store not found') || error.includes('Authentication failed') || error.includes('connect your store'))) {
+    console.log('Dashboard: Showing store connection error state', { error });
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="max-w-lg w-full bg-white rounded-lg shadow-md p-6 text-center">
@@ -329,6 +332,7 @@ const Dashboard = () => {
 
   return (
     <div className="p-6">
+      {console.log('Dashboard: Showing main dashboard content')}
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatsCard
