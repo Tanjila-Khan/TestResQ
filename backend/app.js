@@ -48,8 +48,8 @@ const corsOptions = {
     'http://localhost:3003',
     'http://192.168.0.106:3000',
     'https://jexla.net',
-    'https://cartresq-1.onrender.com',
-    'https://cartresq-yiq2.onrender.com'
+    'https://testresq.onrender.com',
+    'https://testresq-1.onrender.com'
     ];
     
     // Allow requests with no origin (like mobile apps, curl, postman)

@@ -1,0 +1,15 @@
+[1mdiff --git a/backend/app.js b/backend/app.js[m
+[1mindex 07fbc03..946934d 100644[m
+[1m--- a/backend/app.js[m
+[1m+++ b/backend/app.js[m
+[36m@@ -48,8 +48,8 @@[m [mconst corsOptions = {[m
+     'http://localhost:3003',[m
+     'http://192.168.0.106:3000',[m
+     'https://jexla.net',[m
+[31m-    'https://cartresq-1.onrender.com',[m
+[31m-    'https://cartresq-yiq2.onrender.com'[m
+[32m+[m[32m    'https://testresq.onrender.com',[m
+[32m+[m[32m    'https://testresq-1.onrender.com'[m
+     ];[m
+     [m
+     // Allow requests with no origin (like mobile apps, curl, postman)[m
