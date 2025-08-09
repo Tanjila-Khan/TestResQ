@@ -80,6 +80,12 @@ const Dashboard = () => {
       return;
     }
 
+    // Only fetch dashboard data if user has subscription and store connection
+    if (!subscription.status || (subscription.status !== 'active' && subscription.status !== 'trialing')) {
+      console.log('No active subscription, skipping dashboard data fetch');
+      return;
+    }
+
     const controller = new AbortController();
 
     const fetchDashboardData = async () => {
@@ -171,7 +177,7 @@ const Dashboard = () => {
     return () => {
       controller.abort();
     };
-  }, [currentPlatform, timePeriod]);
+  }, [currentPlatform, timePeriod, subscription.status]);
 
   useEffect(() => {
     const fetchSubscription = async () => {
@@ -183,15 +189,14 @@ const Dashboard = () => {
         
         // If we have session_id, check the session status
         if (sessionId) {
-          console.log('Session ID found, checking session status...');
           try {
             const sessionResponse = await api.get(`/api/subscribe/check-session?session_id=${sessionId}`);
-            console.log('Session check response:', sessionResponse.data);
             if (sessionResponse.data.success) {
               setSubscription({ 
                 plan: sessionResponse.data.plan, 
                 status: sessionResponse.data.status 
               });
+              setLoading(false);
               return;
             }
           } catch (sessionErr) {

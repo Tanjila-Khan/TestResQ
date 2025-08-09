@@ -131,7 +131,14 @@ function ProtectedRoute({ children }) {
 
   // Authenticated: block /login, /register, /reset-password
   if (isAuthenticated && ["/login", "/register", "/reset-password"].includes(location.pathname)) {
-    return <Navigate to="/dashboard" replace />;
+    // Check if user has subscription and store connection
+    if (isSubscribed && isStoreConnected) {
+      return <Navigate to="/dashboard" replace />;
+    } else if (isSubscribed && !isStoreConnected) {
+      return <Navigate to="/store-setup" replace />;
+    } else {
+      return <Navigate to="/pricing" replace />;
+    }
   }
 
   // Authenticated but not subscribed: only allow /pricing

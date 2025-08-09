@@ -1175,9 +1175,9 @@
                     
                     showSuccess('signInErrors', 'Login successful! Redirecting...');
                     
-                    // Redirect to dashboard after a short delay
+                    // Redirect to React app root to follow proper authentication flow
                     setTimeout(() => {
-                        window.location.href = '/dashboard';
+                        window.location.href = '/';
                     }, 1000);
                 } else {
                     showError('signInErrors', data.error || 'Login failed');
@@ -1240,9 +1240,9 @@
                     
                     showSuccess('signUpErrors', 'Registration successful! Redirecting...');
                     
-                    // Redirect to dashboard after a short delay
+                    // Redirect to React app root to follow proper authentication flow
                     setTimeout(() => {
-                        window.location.href = '/dashboard';
+                        window.location.href = '/';
                     }, 1000);
                 } else {
                     showError('signUpErrors', data.error || 'Registration failed');
