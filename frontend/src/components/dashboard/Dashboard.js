@@ -147,7 +147,20 @@ const Dashboard = () => {
           return;
         }
         console.error('Error fetching dashboard data:', err);
-        setError('Failed to fetch dashboard data. Please try again later.');
+        
+        // Handle specific error types
+        if (err.response?.status === 503) {
+          const errorData = err.response.data;
+          setError(errorData.message || 'Store connection failed. Please check if your store is running and accessible.');
+        } else if (err.response?.status === 401) {
+          const errorData = err.response.data;
+          setError(errorData.message || 'Authentication failed. Please reconnect your store with valid credentials.');
+        } else if (err.response?.status === 404) {
+          const errorData = err.response.data;
+          setError(errorData.message || 'Store not found. Please connect your store first.');
+        } else {
+          setError('Failed to fetch dashboard data. Please try again later.');
+        }
       } finally {
         setLoading(false);
       }
@@ -242,6 +255,73 @@ const Dashboard = () => {
           >
             Choose a Plan
           </a>
+        </div>
+      </div>
+    );
+  }
+
+  // Show store connection error message
+  if (error && (error.includes('Store connection failed') || error.includes('Store not found') || error.includes('Authentication failed') || error.includes('connect your store'))) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-lg w-full bg-white rounded-lg shadow-md p-6 text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Store Connection Issue</h2>
+          <p className="text-gray-600 mb-4">
+            {error}
+          </p>
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4 text-left">
+            <h3 className="font-semibold text-yellow-900 mb-2">⚠️ Incorrect Store Connection</h3>
+            <p className="text-sm text-yellow-800">
+              It appears you're connected to a store that you didn't set up for this account. 
+              You can disconnect the current store and connect to the correct one.
+            </p>
+          </div>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
+            <h3 className="font-semibold text-blue-900 mb-2">What you can do:</h3>
+            <ul className="text-sm text-blue-800 space-y-1">
+              <li>• Check if your store is running and accessible</li>
+              <li>• Verify your store API credentials are correct</li>
+              <li>• Reconnect your store with updated credentials</li>
+            </ul>
+          </div>
+          <div className="space-y-3">
+            <a
+              href="/store-setup"
+              className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors w-full"
+            >
+              Reconnect Your Store
+            </a>
+            <button
+              onClick={async () => {
+                try {
+                  const response = await api.delete(`/api/stores/disconnect?platform=${currentPlatform}`);
+                  if (response.data.success) {
+                    localStorage.removeItem('isConnected');
+                    localStorage.removeItem('platform');
+                    localStorage.removeItem('storeUrl');
+                    window.location.reload();
+                  }
+                } catch (err) {
+                  console.error('Error disconnecting store:', err);
+                  alert('Failed to disconnect store. Please try again.');
+                }
+              }}
+              className="inline-block bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors w-full"
+            >
+              Disconnect Current Store
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              className="inline-block bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors w-full"
+            >
+              Try Again
+            </button>
+          </div>
         </div>
       </div>
     );

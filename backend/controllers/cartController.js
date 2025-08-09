@@ -222,7 +222,8 @@ const getAbandonedCarts = async (req, res) => {
       console.log('No store connection found for platform:', platform);
       return res.status(404).json({
         error: 'No store connection found',
-        message: `Please connect your ${platform} store first`
+        message: `You haven't connected your ${platform} store yet. Please connect your store to start tracking abandoned carts.`,
+        action: 'connect_store'
       });
     }
 
@@ -567,9 +568,33 @@ const getAbandonedCarts = async (req, res) => {
 
       } catch (error) {
         console.error('Error fetching cart data:', error);
+        
+        // Check if it's a connection error
+        if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND' || error.message.includes('ECONNREFUSED')) {
+          return res.status(503).json({
+            error: 'Store connection failed',
+            message: `Unable to connect to your ${platform} store at ${connection.store_url}. Your store appears to be offline or unreachable.`,
+            details: 'Please check if your store is running and accessible, then try reconnecting.',
+            store_url: connection.store_url,
+            action: 'reconnect_store'
+          });
+        }
+        
+        // Check if it's an authentication error
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          return res.status(401).json({
+            error: 'Authentication failed',
+            message: `Authentication failed for your ${platform} store at ${connection.store_url}. Your store credentials may be incorrect or expired.`,
+            details: 'Please reconnect your store with valid API credentials.',
+            store_url: connection.store_url,
+            action: 'reconnect_store'
+          });
+        }
+        
+        // Generic error response
         res.status(500).json({
           error: 'Failed to fetch abandoned carts',
-          message: error.message
+          message: error.message || 'An unexpected error occurred while fetching cart data.'
         });
       }
     } else if (platform === 'shopify') {

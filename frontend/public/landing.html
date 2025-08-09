@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CartResQ - Recover Lost Sales with Smart Automation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * { font-family: 'Inter', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-pattern {
+            background-image: radial-gradient(circle at 25px 25px, rgba(255,255,255,0.15) 2px, transparent 0);
+            background-size: 50px 50px;
+        }
+        
+        .scroll-smooth { scroll-behavior: smooth; }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-slide-up {
+            animation: slideInUp 0.8s ease-out;
+        }
+    </style>
+</head>
+<body class="scroll-smooth bg-gray-50">
+    <!-- Check if user is authenticated and redirect to dashboard -->
+    <script>
+        const token = localStorage.getItem('token');
+        const user = localStorage.getItem('user');
+        
+        // If user is authenticated, redirect to React app
+        if (token && user) {
+            window.location.href = '/dashboard';
+        }
+    </script>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-200/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-gradient">CartResQ</h1>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#features" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">Features</a>
+                        <a href="#how-it-works" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">How it Works</a>
+                        <a href="#pricing" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">Pricing</a>
+                        <a href="#demo" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">Demo</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="openSignInModal()" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors">Sign In</button>
+                    <button onclick="openSignUpModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-full text-sm font-medium transition-all transform hover:scale-105">
+                        Start Free Trial
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sign In Modal -->
+    <div id="signInModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="bg-white rounded-2xl p-8 max-w-md w-full">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">Sign in to your account</h2>
+                    <button onclick="closeSignInModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="signInForm" class="space-y-6" onsubmit="handleSignIn(event)">
+                    <div>
+                        <label for="signInEmail" class="block text-sm font-medium text-gray-700 mb-2">Email address</label>
+                        <input type="email" id="signInEmail" name="email" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                        <label for="signInPassword" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" id="signInPassword" name="password" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="remember" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                            <label for="remember" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                        </div>
+                        <a href="javascript:void(0)" onclick="closeSignInModal(); openForgotPasswordModal()" class="text-sm text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+                    </div>
+                    
+                    <div id="signInErrors" class="hidden"></div>
+                    
+                    <button type="submit" id="signInButton" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
+                        Sign in
+                    </button>
+                </form>
+                
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-600">Don't have an account? 
+                        <a href="javascript:void(0)" onclick="closeSignInModal(); openSignUpModal()" class="text-indigo-600 hover:text-indigo-500 font-medium">Sign up</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sign Up Modal -->
+    <div id="signUpModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="bg-white rounded-2xl p-8 max-w-md w-full">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">Create your account</h2>
+                    <button onclick="closeSignUpModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="signUpForm" class="space-y-6" onsubmit="handleSignUp(event)">
+                    <div>
+                        <label for="signUpName" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                        <input type="text" id="signUpName" name="name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                        <label for="signUpEmail" class="block text-sm font-medium text-gray-700 mb-2">Email address</label>
+                        <input type="email" id="signUpEmail" name="email" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                        <label for="signUpPassword" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" id="signUpPassword" name="password" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                        <label for="signUpConfirmPassword" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                        <input type="password" id="signUpConfirmPassword" name="confirm-password" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    
+                    <div id="signUpErrors" class="hidden"></div>
+                    
+                    <button type="submit" id="signUpButton" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
+                        Create Account
+                    </button>
+                </form>
+                
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-600">Already have an account? 
+                        <a href="javascript:void(0)" onclick="closeSignUpModal(); openSignInModal()" class="text-indigo-600 hover:text-indigo-500 font-medium">Sign in</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="bg-white rounded-2xl p-8 max-w-md w-full">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">Reset your password</h2>
+                    <button onclick="closeForgotPasswordModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <p class="text-gray-600 mb-6">Enter your email address and we'll send you a link to reset your password.</p>
+                
+                <form id="forgotPasswordForm" class="space-y-6" onsubmit="handleForgotPassword(event)">
+                    <div>
+                        <label for="forgotPasswordEmail" class="block text-sm font-medium text-gray-700 mb-2">Email address</label>
+                        <input type="email" id="forgotPasswordEmail" name="email" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    
+                    <div id="forgotPasswordErrors" class="hidden"></div>
+                    <div id="forgotPasswordSuccess" class="hidden"></div>
+                    
+                    <button type="submit" id="forgotPasswordButton" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
+                        Send reset link
+                    </button>
+                </form>
+                
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-600">Remember your password? 
+                                                   <a href="javascript:void(0)" onclick="closeForgotPasswordModal(); openSignInModal()" class="text-indigo-600 hover:text-indigo-500 font-medium">Sign in</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center gradient-bg hero-pattern overflow-hidden">
+        <div class="absolute inset-0 bg-black/20"></div>
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="animate-slide-up">
+                    <h1 class="text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+                        Recover
+                        <span class="block text-yellow-300">Lost Sales</span>
+                        Automatically
+                    </h1>
+                    <p class="text-xl text-gray-200 mb-8 leading-relaxed">
+                        Turn abandoned carts into recovered revenue with intelligent email campaigns, 
+                        personalized offers, and data-driven insights that convert.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 mb-12">
+                        <button onclick="handleSubscription('free')" class="bg-white text-indigo-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl">
+                            Start 14-Day Free Trial
+                        </button>
+                        <button class="border-2 border-white text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-indigo-600 transition-all">
+                            Watch Demo
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center space-x-8 text-white/80">
+                        <div class="flex items-center">
+                            <span class="text-2xl font-bold text-yellow-300">30.8%</span>
+                            <span class="ml-2">Average Recovery Rate</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-2xl font-bold text-yellow-300">$7.8K</span>
+                            <span class="ml-2">Monthly Recovery</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="relative lg:block hidden">
+                    <div class="animate-float">
+                        <div class="glass-effect rounded-3xl p-8 shadow-2xl">
+                            <div class="bg-white rounded-2xl p-6 shadow-lg">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="font-semibold text-gray-800">Dashboard Preview</h3>
+                                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Abandoned Carts</span>
+                                        <span class="font-bold text-indigo-600">156</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Recovered</span>
+                                        <span class="font-bold text-green-600">48</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full" style="width: 31%"></div>
+                                    </div>
+                                    <div class="text-right text-sm text-gray-500">30.8% Recovery Rate</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Floating Elements -->
+        <div class="absolute top-20 right-20 w-20 h-20 bg-yellow-300/20 rounded-full animate-pulse-slow"></div>
+        <div class="absolute bottom-40 left-20 w-16 h-16 bg-purple-300/20 rounded-full animate-float"></div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+                    Powerful Features for
+                    <span class="text-gradient">Maximum Recovery</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Everything you need to turn abandoned carts into revenue-generating opportunities
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="card-hover bg-gray-50 rounded-2xl p-8 text-center">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 0h10m-10 0a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Smart Email Campaigns</h3>
+                    <p class="text-gray-600">Automated, personalized email sequences that adapt to customer behavior and maximize conversion rates.</p>
+                </div>
+                
+                <div class="card-hover bg-gray-50 rounded-2xl p-8 text-center">
+                    <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Real-time Analytics</h3>
+                    <p class="text-gray-600">Track performance with detailed insights, conversion metrics, and revenue attribution in real-time.</p>
+                </div>
+                
+                <div class="card-hover bg-gray-50 rounded-2xl p-8 text-center">
+                    <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Dynamic Coupons</h3>
+                    <p class="text-gray-600">Create personalized discount codes and offers that incentivize customers to complete their purchase.</p>
+                </div>
+                
+                <div class="card-hover bg-gray-50 rounded-2xl p-8 text-center">
+                    <div class="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Multi-channel Outreach</h3>
+                    <p class="text-gray-600">Reach customers through email, SMS, and push notifications with coordinated messaging campaigns.</p>
+                </div>
+                
+                <div class="card-hover bg-gray-50 rounded-2xl p-8 text-center">
+                    <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Lightning Fast Setup</h3>
+                    <p class="text-gray-600">Get started in minutes with our simple integration and pre-built templates for immediate results.</p>
+                </div>
+                
+                <div class="card-hover bg-gray-50 rounded-2xl p-8 text-center">
+                    <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Enterprise Security</h3>
+                    <p class="text-gray-600">Bank-level security with GDPR compliance, data encryption, and secure customer data handling.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+                    How CartResQ
+                    <span class="text-gradient">Works</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Simple, automated cart recovery in three powerful steps
+                </p>
+            </div>
+            
+            <div class="relative">
+                <div class="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-indigo-500 to-purple-600 rounded-full hidden lg:block"></div>
+                
+                <div class="space-y-16">
+                    <div class="flex flex-col lg:flex-row items-center">
+                        <div class="lg:w-1/2 lg:pr-12 mb-8 lg:mb-0">
+                            <div class="bg-white rounded-2xl p-8 shadow-xl card-hover">
+                                <div class="flex items-center mb-6">
+                                    <div class="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center">
+                                        <span class="text-indigo-600 font-bold text-lg">1</span>
+                                    </div>
+                                    <h3 class="text-2xl font-bold text-gray-900 ml-4">Detect Abandonment</h3>
+                                </div>
+                                <p class="text-gray-600 text-lg">
+                                    Our intelligent tracking system automatically detects when customers abandon their carts 
+                                    and captures their information for recovery campaigns.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="lg:w-1/2 lg:pl-12">
+                            <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-8 text-white">
+                                <div class="text-center">
+                                    <div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 0h10m-10 0a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2"/>
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-xl font-semibold mb-2">Real-time Detection</h4>
+                                    <p class="text-white/80">Instant cart abandonment alerts</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col lg:flex-row-reverse items-center">
+                        <div class="lg:w-1/2 lg:pl-12 mb-8 lg:mb-0">
+                            <div class="bg-white rounded-2xl p-8 shadow-xl card-hover">
+                                <div class="flex items-center mb-6">
+                                    <div class="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
+                                        <span class="text-green-600 font-bold text-lg">2</span>
+                                    </div>
+                                    <h3 class="text-2xl font-bold text-gray-900 ml-4">Send Smart Campaigns</h3>
+                                </div>
+                                <p class="text-gray-600 text-lg">
+                                    Automatically trigger personalized email sequences with dynamic content, 
+                                    product recommendations, and time-sensitive offers.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="lg:w-1/2 lg:pr-12">
+                            <div class="bg-gradient-to-r from-green-500 to-teal-600 rounded-2xl p-8 text-white">
+                                <div class="text-center">
+                                    <div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-xl font-semibold mb-2">Automated Sequences</h4>
+                                    <p class="text-white/80">Personalized recovery campaigns</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col lg:flex-row items-center">
+                        <div class="lg:w-1/2 lg:pr-12 mb-8 lg:mb-0">
+                            <div class="bg-white rounded-2xl p-8 shadow-xl card-hover">
+                                <div class="flex items-center mb-6">
+                                    <div class="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center">
+                                        <span class="text-purple-600 font-bold text-lg">3</span>
+                                    </div>
+                                    <h3 class="text-2xl font-bold text-gray-900 ml-4">Track & Optimize</h3>
+                                </div>
+                                <p class="text-gray-600 text-lg">
+                                    Monitor performance with detailed analytics and continuously optimize 
+                                    your campaigns for maximum revenue recovery.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="lg:w-1/2 lg:pl-12">
+                            <div class="bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl p-8 text-white">
+                                <div class="text-center">
+                                    <div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-xl font-semibold mb-2">Performance Analytics</h4>
+                                    <p class="text-white/80">Real-time insights & optimization</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Video Section -->
+    <section id="demo" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+                    See CartResQ in
+                    <span class="text-gradient">Action</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Watch how easy it is to set up and start recovering abandoned carts
+                </p>
+            </div>
+            
+            <div class="relative max-w-4xl mx-auto">
+                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-3xl p-2">
+                    <div class="bg-black rounded-2xl aspect-video flex items-center justify-center">
+                        <div class="text-center text-white">
+                            <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 cursor-pointer hover:bg-white/30 transition-colors">
+                                <svg class="w-8 h-8 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2">Platform Demo Video</h3>
+                            <p class="text-white/80">Click to watch a 3-minute demo</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="absolute -top-4 -right-4 w-24 h-24 bg-yellow-300 rounded-full flex items-center justify-center animate-pulse">
+                    <span class="text-gray-900 font-bold text-sm">NEW!</span>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl font-bold text-indigo-600">3</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Minutes Setup</h3>
+                    <p class="text-gray-600">Get started immediately</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl font-bold text-green-600">30%</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Average Recovery</h3>
+                    <p class="text-gray-600">Industry-leading results</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl font-bold text-purple-600">24/7</span>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Auto Recovery</h3>
+                    <p class="text-gray-600">Works while you sleep</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof Section -->
+    <section class="py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                    Trusted by Growing Businesses
+                </h2>
+                <p class="text-xl text-gray-600">
+                    Join thousands of merchants recovering millions in lost revenue
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+                <div class="bg-white rounded-xl p-6 shadow-lg flex items-center justify-center">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gray-200 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                            <span class="text-gray-500 font-bold">LOGO</span>
+                        </div>
+                        <span class="text-sm text-gray-600">Company A</span>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-6 shadow-lg flex items-center justify-center">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gray-200 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                            <span class="text-gray-500 font-bold">LOGO</span>
+                        </div>
+                        <span class="text-sm text-gray-600">Company B</span>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-6 shadow-lg flex items-center justify-center">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gray-200 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                            <span class="text-gray-500 font-bold">LOGO</span>
+                        </div>
+                        <span class="text-sm text-gray-600">Company C</span>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-6 shadow-lg flex items-center justify-center">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gray-200 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                            <span class="text-gray-500 font-bold">LOGO</span>
+                        </div>
+                        <span class="text-sm text-gray-600">Company D</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-2xl p-8 shadow-xl">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                            <span class="text-2xl">⭐</span>
+                        </div>
+                        <div class="ml-4">
+                            <div class="flex text-yellow-400">
+                                <span>★★★★★</span>
+                            </div>
+                            <p class="text-sm text-gray-500">5.0 rating</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 mb-6 italic">
+                        "CartResQ increased our cart recovery rate by 45% in just the first month. 
+                        The automated campaigns are incredibly effective!"
+                    </p>
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
+                        <div class="ml-3">
+                            <p class="font-semibold text-gray-900">Sarah Johnson</p>
+                            <p class="text-sm text-gray-600">CEO, TechStore</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-8 shadow-xl">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                            <span class="text-2xl">⭐</span>
+                        </div>
+                        <div class="ml-4">
+                            <div class="flex text-yellow-400">
+                                <span>★★★★★</span>
+                            </div>
+                            <p class="text-sm text-gray-500">5.0 rating</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 mb-6 italic">
+                        "The setup was incredibly easy and the results were immediate. 
+                        We recovered $12K in the first week alone!"
+                    </p>
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
+                        <div class="ml-3">
+                            <p class="font-semibold text-gray-900">Mike Chen</p>
+                            <p class="text-sm text-gray-600">Founder, Fashion Hub</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-8 shadow-xl">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                            <span class="text-2xl">⭐</span>
+                        </div>
+                        <div class="ml-4">
+                            <div class="flex text-yellow-400">
+                                <span>★★★★★</span>
+                            </div>
+                            <p class="text-sm text-gray-500">5.0 rating</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 mb-6 italic">
+                        "Best investment we've made for our e-commerce business. 
+                        The ROI is incredible and support team is fantastic!"
+                    </p>
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
+                        <div class="ml-3">
+                            <p class="font-semibold text-gray-900">Emma Williams</p>
+                            <p class="text-sm text-gray-600">Director, HomeGoods</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+                    Simple, Transparent
+                    <span class="text-gradient">Pricing</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Choose the plan that fits your business size and watch your revenue grow
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Free Plan -->
+                <div class="bg-gray-50 rounded-2xl p-8 card-hover relative">
+                    <div class="text-center">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">CartResQ Lite</h3>
+                        <p class="text-gray-600 mb-6">Perfect for getting started</p>
+                        <div class="mb-6">
+                            <span class="text-4xl font-bold text-gray-900">$0</span>
+                            <span class="text-gray-500">/month</span>
+                        </div>
+                    </div>
+                    
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">1 connected store (WooCommerce or Shopify)</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Detect and view abandoned carts</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">1 automated email recovery workflow</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Send up to 500 recovery emails/month</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Basic cart analytics</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Manual coupon creation</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Responsive dashboard</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Email support</span>
+                        </li>
+                    </ul>
+                    
+                    <button onclick="handleSubscription('free')" class="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-full font-semibold transition-colors">
+                        Start Free Trial
+                    </button>
+                </div>
+                
+                <!-- Starter Plan -->
+                <div class="bg-gradient-to-b from-indigo-500 to-purple-600 rounded-2xl p-8 card-hover relative text-white">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-yellow-400 text-gray-900 px-4 py-1 rounded-full text-sm font-semibold">
+                            Most Popular
+                        </span>
+                    </div>
+                    
+                    <div class="text-center">
+                        <h3 class="text-xl font-semibold mb-2">CartResQ Starter</h3>
+                        <p class="text-indigo-100 mb-6">Perfect for small businesses</p>
+                        <div class="mb-6">
+                            <span class="text-4xl font-bold">$19</span>
+                            <span class="text-indigo-200">/month</span>
+                        </div>
+                    </div>
+                    
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-300 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Everything in Free, plus:</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-300 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Up to 2 connected stores</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-300 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Up to 5,000 recovery emails/month</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-300 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Unlimited automated email workflows</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-300 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Pre-built cart recovery email templates</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-300 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Manual SMS & WhatsApp sending</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-300 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Custom discount coupons with auto-sync</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-300 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Advanced cart and coupon analytics</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-300 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Scheduled email campaigns</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-300 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Customer segmentation</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-300 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Real-time notifications</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-300 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Priority email/chat support</span>
+                        </li>
+                    </ul>
+                    
+                    <button onclick="handleSubscription('starter')" class="w-full bg-white text-indigo-600 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors">
+                        Start Free Trial
+                    </button>
+                </div>
+                
+                <!-- Growth Plan -->
+                <div class="bg-gray-50 rounded-2xl p-8 card-hover relative">
+                    <div class="text-center">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">CartResQ Growth</h3>
+                        <p class="text-gray-600 mb-6">For growing businesses</p>
+                        <div class="mb-6">
+                            <span class="text-4xl font-bold text-gray-900">$49</span>
+                            <span class="text-gray-500">/month</span>
+                        </div>
+                    </div>
+                    
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Everything in Starter, plus:</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Up to 3 connected stores</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Unlimited email recovery sends</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Automated SMS & WhatsApp recovery messages</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Full communication history tracking</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Advanced segmentation: behavior + cart value</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Multi-store dashboard with cross-store comparison</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Real-time analytics (conversion rates, top products, CLV)</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">ROI tracking dashboard</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Notification preferences management</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Export analytics/chart data</span>
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Premium support (email, chat, onboarding help)</span>
+                        </li>
+                    </ul>
+                    
+                    <button onclick="handleSubscription('growth')" class="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-full font-semibold transition-colors">
+                        Start Free Trial
+                    </button>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <p class="text-gray-600 mb-4">All plans include a 14-day free trial • No credit card required</p>
+                <div class="flex justify-center space-x-6 text-sm text-gray-500">
+                    <span>✓ Cancel anytime</span>
+                    <span>✓ 30-day money-back guarantee</span>
+                    <span>✓ Free migration assistance</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-24 gradient-bg hero-pattern relative overflow-hidden">
+        <div class="absolute inset-0 bg-black/20"></div>
+        <div class="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl lg:text-6xl font-bold text-white mb-6">
+                Ready to Recover
+                <span class="text-yellow-300">Lost Revenue?</span>
+            </h2>
+            <p class="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
+                Join thousands of merchants who've already recovered millions in abandoned cart revenue. 
+                Start your free trial today and see results in 24 hours.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <button onclick="handleSubscription('free')" class="bg-white text-indigo-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl">
+                    Start Your Free Trial
+                </button>
+                <button class="border-2 border-white text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-indigo-600 transition-all">
+                    Schedule a Demo
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-white/90">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-yellow-300 mb-2">14 Days</div>
+                    <div>Free Trial</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-yellow-300 mb-2">No Setup</div>
+                    <div>Fees</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-yellow-300 mb-2">24/7</div>
+                    <div>Support</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <h3 class="text-2xl font-bold text-gradient mb-4">CartResQ</h3>
+                    <p class="text-gray-400 mb-6 max-w-md">
+                        The most powerful abandoned cart recovery platform for e-commerce businesses. 
+                        Recover lost sales and boost your revenue with intelligent automation.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors">
+                            <span class="text-sm">f</span>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors">
+                            <span class="text-sm">t</span>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors">
+                            <span class="text-sm">in</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Product</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Features</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Pricing</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Integrations</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">API</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400">© 2025 CartResQ. All rights reserved.</p>
+                <p class="text-gray-400 mt-4 md:mt-0">Made with ❤️ for e-commerce success</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- API Configuration and JavaScript -->
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'http://localhost:3003/api';
+        
+        // Modal functions
+        function openSignInModal() {
+            document.getElementById('signInModal').classList.remove('hidden');
+        }
+        
+        function closeSignInModal() {
+            document.getElementById('signInModal').classList.add('hidden');
+            // Clear form
+            document.getElementById('signInForm').reset();
+            clearErrors('signInErrors');
+        }
+        
+        function openSignUpModal() {
+            document.getElementById('signUpModal').classList.remove('hidden');
+        }
+        
+        function closeSignUpModal() {
+            document.getElementById('signUpModal').classList.add('hidden');
+            // Clear form
+            document.getElementById('signUpForm').reset();
+            clearErrors('signUpErrors');
+        }
+
+        // Forgot Password Modal functions
+        function openForgotPasswordModal() {
+            document.getElementById('forgotPasswordModal').classList.remove('hidden');
+            clearErrors('forgotPasswordErrors');
+            clearSuccess('forgotPasswordSuccess');
+        }
+
+        function closeForgotPasswordModal() {
+            document.getElementById('forgotPasswordModal').classList.add('hidden');
+            document.getElementById('forgotPasswordForm').reset();
+            clearErrors('forgotPasswordErrors');
+            clearSuccess('forgotPasswordSuccess');
+        }
+        
+        // Error handling
+        function showError(containerId, message) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<div class="text-red-500 text-sm mt-2">${message}</div>`;
+            container.classList.remove('hidden');
+        }
+        
+        function clearErrors(containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            container.classList.add('hidden');
+        }
+
+        function clearSuccess(containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            container.classList.add('hidden');
+        }
+        
+        function showSuccess(containerId, message) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<div class="text-green-500 text-sm mt-2">${message}</div>`;
+            container.classList.remove('hidden');
+        }
+        
+        // Loading states
+        function setLoading(buttonId, isLoading) {
+            const button = document.getElementById(buttonId);
+            if (isLoading) {
+                button.disabled = true;
+                button.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Processing...';
+            } else {
+                button.disabled = false;
+                button.innerHTML = button.getAttribute('data-original-text') || 'Sign In';
+            }
+        }
+        
+        // Authentication functions
+        async function handleSignIn(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('signInEmail').value;
+            const password = document.getElementById('signInPassword').value;
+            
+            if (!email || !password) {
+                showError('signInErrors', 'Please fill in all fields');
+                return;
+            }
+            
+            setLoading('signInButton', true);
+            clearErrors('signInErrors');
+            
+            try {
+                console.log('Attempting login to:', `${API_BASE_URL}/auth/login`);
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Store token and user data
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    showSuccess('signInErrors', 'Login successful! Redirecting...');
+                    
+                    // Redirect to dashboard after a short delay
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000);
+                } else {
+                    showError('signInErrors', data.error || 'Login failed');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    showError('signInErrors', 'Cannot connect to server. Please check if the backend is running.');
+                } else {
+                    showError('signInErrors', 'Network error. Please try again.');
+                }
+            } finally {
+                setLoading('signInButton', false);
+            }
+        }
+        
+        async function handleSignUp(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('signUpName').value;
+            const email = document.getElementById('signUpEmail').value;
+            const password = document.getElementById('signUpPassword').value;
+            const confirmPassword = document.getElementById('signUpConfirmPassword').value;
+            
+            if (!name || !email || !password || !confirmPassword) {
+                showError('signUpErrors', 'Please fill in all fields');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showError('signUpErrors', 'Passwords do not match');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showError('signUpErrors', 'Password must be at least 6 characters');
+                return;
+            }
+            
+            setLoading('signUpButton', true);
+            clearErrors('signUpErrors');
+            
+            try {
+                console.log('Attempting registration to:', `${API_BASE_URL}/auth/register`);
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Store token and user data
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    showSuccess('signUpErrors', 'Registration successful! Redirecting...');
+                    
+                    // Redirect to dashboard after a short delay
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000);
+                } else {
+                    showError('signUpErrors', data.error || 'Registration failed');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    showError('signUpErrors', 'Cannot connect to server. Please check if the backend is running.');
+                } else {
+                    showError('signUpErrors', 'Network error. Please try again.');
+                }
+            } finally {
+                setLoading('signUpButton', false);
+            }
+        }
+
+        // Forgot Password function
+        async function handleForgotPassword(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('forgotPasswordEmail').value;
+            
+            if (!email) {
+                showError('forgotPasswordErrors', 'Please enter your email address');
+                return;
+            }
+            
+            setLoading('forgotPasswordButton', true);
+            clearErrors('forgotPasswordErrors');
+            clearSuccess('forgotPasswordSuccess');
+            
+            try {
+                console.log('Attempting forgot password for:', `${API_BASE_URL}/auth/forgot-password`);
+                const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                });
+                
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showSuccess('forgotPasswordSuccess', 'If an account with that email exists, a password reset link has been sent to your email address.');
+                    document.getElementById('forgotPasswordForm').reset();
+                } else {
+                    showError('forgotPasswordErrors', data.error || 'Failed to send reset email');
+                }
+            } catch (error) {
+                console.error('Forgot password error:', error);
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    showError('forgotPasswordErrors', 'Cannot connect to server. Please check if the backend is running.');
+                } else {
+                    showError('forgotPasswordErrors', 'Network error. Please try again.');
+                }
+            } finally {
+                setLoading('forgotPasswordButton', false);
+            }
+        }
+        
+        // Subscription functions
+        async function handleSubscription(planKey) {
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                // If not logged in, open sign up modal
+                openSignUpModal();
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/subscribe/create-checkout-session`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ planKey })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    if (data.isFreePlan) {
+                        // Redirect to dashboard for free plan
+                        window.location.href = '/dashboard';
+                    } else {
+                        // Redirect to Stripe checkout
+                        window.location.href = data.url;
+                    }
+                } else {
+                    alert('Error creating checkout session: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Subscription error:', error);
+                alert('Network error. Please try again.');
+            }
+        }
+        
+        // Close modals when clicking outside
+        document.addEventListener('click', function(event) {
+            const signInModal = document.getElementById('signInModal');
+            const signUpModal = document.getElementById('signUpModal');
+            const forgotPasswordModal = document.getElementById('forgotPasswordModal');
+            
+            if (event.target === signInModal) {
+                closeSignInModal();
+            }
+            if (event.target === signUpModal) {
+                closeSignUpModal();
+            }
+            if (event.target === forgotPasswordModal) {
+                closeForgotPasswordModal();
+            }
+        });
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+                // Skip if href is just "#" or empty (invalid selector)
+                if (href === '#' || href === '' || !href) {
+                    return;
+                }
+                try {
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                } catch (error) {
+                    console.warn('Invalid selector for smooth scrolling:', href);
+                }
+            });
+        });
+
+        // Add scroll effect to navbar
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.classList.add('bg-white/95');
+                nav.classList.remove('bg-white/80');
+            } else {
+                nav.classList.add('bg-white/80');
+                nav.classList.remove('bg-white/95');
+            }
+        });
+
+        // Add intersection observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-slide-up');
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for animation
+        document.querySelectorAll('.card-hover').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Initialize button text
+        document.addEventListener('DOMContentLoaded', function() {
+            const signInButton = document.getElementById('signInButton');
+            const signUpButton = document.getElementById('signUpButton');
+            
+            if (signInButton) {
+                signInButton.setAttribute('data-original-text', signInButton.innerHTML);
+            }
+            if (signUpButton) {
+                signUpButton.setAttribute('data-original-text', signUpButton.innerHTML);
+            }
+        });
+    </script>
+</body>
+</html> 

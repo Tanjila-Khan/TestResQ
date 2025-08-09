@@ -29,6 +29,22 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    
+    <!-- Redirect to landing page if not authenticated -->
+    <script>
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      
+      // Check if current path is reset-password (should be accessible without auth)
+      const currentPath = window.location.pathname;
+      const isResetPassword = currentPath === '/reset-password';
+      
+      // If not authenticated and not on reset-password page, redirect to landing page
+      if ((!token || !user) && !isResetPassword) {
+        window.location.href = '/landing.html';
+      }
+    </script>
+    
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
@@ -40,4 +56,4 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
   </body>
-</html>
+</html> 

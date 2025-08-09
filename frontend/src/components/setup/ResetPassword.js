@@ -46,7 +46,7 @@ const ResetPassword = () => {
       
       setSuccess(true);
       setTimeout(() => {
-        navigate('/login');
+        window.location.href = '/landing.html';
       }, 3000);
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to reset password. Please try again.');
@@ -63,7 +63,7 @@ const ResetPassword = () => {
             Password Reset Successful
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Your password has been reset successfully. You will be redirected to the login page shortly.
+            Your password has been reset successfully. You will be redirected to the landing page shortly.
           </p>
         </div>
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -85,7 +85,7 @@ const ResetPassword = () => {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm text-green-800">
-                    Password reset successful! Redirecting to login...
+                    Password reset successful! Redirecting to landing page...
                   </p>
                 </div>
               </div>
@@ -131,10 +131,10 @@ const ResetPassword = () => {
             </div>
             <div className="mt-6 text-center">
               <button
-                onClick={() => navigate('/login')}
+                onClick={() => window.location.href = '/landing.html'}
                 className="text-sm text-blue-600 hover:text-blue-500"
               >
-                Back to Login
+                Back to Landing Page
               </button>
             </div>
           </div>
@@ -231,10 +231,10 @@ const ResetPassword = () => {
             <div className="text-center">
               <button
                 type="button"
-                onClick={() => navigate('/login')}
+                onClick={() => window.location.href = '/landing.html'}
                 className="text-sm text-blue-600 hover:text-blue-500"
               >
-                Back to Login
+                Back to Landing Page
               </button>
             </div>
           </form>
