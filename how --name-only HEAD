@@ -1,0 +1,5 @@
+[33ma480164[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Fix multiple issues: Remove duplicate API_BASE_URL, fix JSON parsing errors, remove Tailwind CDN, improve error handling
+[33m2f92005[m Fix frontend-backend connection: Update API URLs to use correct backend service (testresq-1.onrender.com)
+[33mafdf4eb[m Fix app.js and App.js issues
+[33m43ad383[m Fix blank page issue by adding proper loading states and error handling - Add loading indicator to ProtectedRoute component - Add loading state to App component - Add fallback loading state to SmartRedirect component - Improve error handling for authentication flow
+[33m163aede[m Fix static asset loading issues for production deployment - Update index.html to use relative paths instead of %PUBLIC_URL% placeholders - Add homepage field to package.json for proper static asset paths - Update render.yaml to set PUBLIC_URL environment variable - Fix CSS and favicon loading issues
