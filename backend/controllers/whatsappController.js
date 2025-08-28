@@ -1,7 +1,6 @@
 const twilio = require('twilio');
 const AbandonedCart = require('../models/AbandonedCart');
 const StoreConnection = require('../models/StoreConnection');
-const twilioConfig = require('../config/twilio');
 const Cart = require('../models/Cart');
 const path = require('path');
 const fs = require('fs');
@@ -52,12 +51,8 @@ const canSendWhatsApp = async (cart) => {
   return true;
 };
 
-// Add a helper to check if we're within the allowed 24-hour window
-const isWithinAllowedWindow = (cart) => {
-  if (!cart.whatsapp_sent_at) return false;
-  const hoursSinceLastMessage = (new Date() - new Date(cart.whatsapp_sent_at)) / (1000 * 60 * 60);
-  return (hoursSinceLastMessage < 24);
-};
+// Note: With approved message templates, we don't need to check the 24-hour window
+// Templates can be sent at any time without customer interaction
 
 // Send WhatsApp reminder for abandoned cart
 exports.sendWhatsAppReminder = async (req, res) => {
@@ -125,10 +120,40 @@ exports.sendWhatsAppReminder = async (req, res) => {
     }
 
     // Check if customer has WhatsApp number
-    const whatsappNumber = cart.customer_data?.whatsapp || cart.customer_data?.phone;
+    let whatsappNumber = cart.customer_data?.whatsapp || cart.customer_data?.phone;
     if (!whatsappNumber) {
       return res.status(400).json({ error: 'No WhatsApp number found for customer' });
     }
+    
+    // Try to detect country from cart data
+    let detectedCountry = 'US'; // Default fallback
+    
+    // Priority order for country detection
+    if (cart.customer_data?.address?.country) {
+      detectedCountry = cart.customer_data.address.country.toUpperCase();
+    } else if (cart.customer_data?.country) {
+      detectedCountry = cart.customer_data.country.toUpperCase();
+    } else if (cart.customer_data?.country_code) {
+      detectedCountry = cart.customer_data.country_code.toUpperCase();
+    } else if (cart.shipping_address?.country) {
+      detectedCountry = cart.shipping_address.country.toUpperCase();
+    }
+    
+    console.log('WhatsApp - Detected country:', detectedCountry);
+    
+    // Format phone number for international WhatsApp
+    const { formatPhoneNumberForSMS } = require('./smsController');
+    whatsappNumber = formatPhoneNumberForSMS(whatsappNumber, detectedCountry);
+    
+    if (!whatsappNumber) {
+      return res.status(400).json({ 
+        error: 'Invalid phone number format for WhatsApp',
+        detectedCountry,
+        originalNumber: cart.customer_data?.whatsapp || cart.customer_data?.phone
+      });
+    }
+    
+    console.log('WhatsApp - Formatted number:', whatsappNumber);
 
     // Format cart items
     const cartItems = cart.items || cart.cart || [];
@@ -186,31 +211,41 @@ exports.sendWhatsAppReminder = async (req, res) => {
       'Reply STOP to unsubscribe'
     ].filter(Boolean).join('\n');
 
-    // (Create a template payload (or free-form body) depending on the allowed window.)
+    // Use approved message template for WhatsApp Business API
+    // This allows sending messages without the 24-hour window limitation
+    const templateName = process.env.TWILIO_WHATSAPP_TEMPLATE_NAME || "cart_reminder";
+    const templateSid = process.env.TWILIO_WHATSAPP_TEMPLATE_SID;
+    
     let messagePayload;
-    if (isWithinAllowedWindow(cart)) {
-       // (We're inside the 24–h window, so send a free–form (non–template) message.)
-       messagePayload = { body: messageBody };
+    
+    if (templateSid) {
+      // Use Content Template (recommended approach)
+      messagePayload = {
+        contentSid: templateSid,
+        contentVariables: {
+          "1": storeConnection.store_name || "our store",
+          "2": cartItems.length.toString(),
+          "3": `$${cartSummary.total.toFixed(2)}`,
+          "4": checkoutUrl || `${storeUrl}/cart`
+        }
+      };
     } else {
-       // (Outside the allowed window, so use a template (e.g. "cart_reminder") with variables.)
-       // (Replace "cart_reminder" with your approved template name (e.g. "cart_reminder" or "cart_abandoned") and supply the variables (e.g. "store_name", "item_count", "cart_total", "checkout_url") as a JSON object.)
-       // (Note: You must have a pre–approved template in your Twilio WhatsApp account.)
-       messagePayload = {
-         body: (process.env.TWILIO_WHATSAPP_TEMPLATE_NAME || "cart_reminder"),
-         contentSid: (process.env.TWILIO_WHATSAPP_TEMPLATE_SID || "HX…"), // (Replace "HX…" with your actual template SID if you use a contentSid.)
-         contentVariables: JSON.stringify({ 
-           "store_name": (storeConnection.store_name || "our store"), 
-           "item_count": (cartItems.length || 0), 
-           "cart_total": (cartSummary.total.toFixed(2) || "0.00"), 
-           "checkout_url": (checkoutUrl || (storeUrl + "/cart")) 
-         })
-       };
+      // Use Message Template (fallback approach)
+      messagePayload = {
+        body: templateName,
+        contentVariables: {
+          "1": storeConnection.store_name || "our store",
+          "2": cartItems.length.toString(),
+          "3": `$${cartSummary.total.toFixed(2)}`,
+          "4": checkoutUrl || `${storeUrl}/cart`
+        }
+      };
     }
 
     // (Update cart status (e.g. "sending") and increment attempts.)
     await AbandonedCart.findOneAndUpdate({ cart_id: cartId }, { $set: { whatsapp_status: "sending" }, $inc: { whatsapp_attempts: 1 } });
 
-    // (Get Twilio WhatsApp number (with "whatsapp:" prefix) and format recipient (with "whatsapp:" prefix).)
+    // Get Twilio WhatsApp number (with "whatsapp:" prefix) and format recipient (with "whatsapp:" prefix)
     let twilioWhatsAppNumber = process.env.TWILIO_WHATSAPP_NUMBER;
     if (!twilioWhatsAppNumber) { 
       return res.status(500).json({ 
@@ -218,8 +253,20 @@ exports.sendWhatsAppReminder = async (req, res) => {
         message: 'Twilio WhatsApp number not configured. Please contact support.'
       });
     }
-    if (!twilioWhatsAppNumber.startsWith("whatsapp:")) { twilioWhatsAppNumber = "whatsapp:" + twilioWhatsAppNumber.replace(/[^0-9]/g, ""); }
-    const formattedNumber = (whatsappNumber.startsWith("whatsapp:") ? whatsappNumber : ("whatsapp:" + whatsappNumber.replace(/[^0-9]/g, "")));
+    if (!twilioWhatsAppNumber.startsWith("whatsapp:")) { 
+      twilioWhatsAppNumber = "whatsapp:" + twilioWhatsAppNumber.replace(/[^0-9]/g, ""); 
+    }
+    
+    // Format the recipient number for WhatsApp
+    const formattedNumber = whatsappNumber.startsWith("whatsapp:") ? 
+      whatsappNumber : 
+      "whatsapp:" + whatsappNumber;
+    
+    console.log('WhatsApp - Sending message:', {
+      from: twilioWhatsAppNumber,
+      to: formattedNumber,
+      messagePayload
+    });
 
     // (Send the WhatsApp message (using twilioClient.messages.create) with the payload (free–form or template) and "from" (twilioWhatsAppNumber) and "to" (formattedNumber).)
     const message = await twilioClient.messages.create({ ...messagePayload, from: twilioWhatsAppNumber, to: formattedNumber });
@@ -231,6 +278,20 @@ exports.sendWhatsAppReminder = async (req, res) => {
   } catch (error) {
     log(`Error sending WhatsApp message: ${error.message}`, true);
     console.error('Error sending WhatsApp message:', error);
+    
+    // Update cart status to failed
+    try {
+      await AbandonedCart.findOneAndUpdate({ cart_id: cartId }, {
+        $set: {
+          whatsapp_status: 'failed',
+          last_whatsapp_error: error.message
+        }
+      });
+      console.log(`Updated cart ${cartId} with WhatsApp failed status`);
+    } catch (updateError) {
+      console.error('Error updating cart with WhatsApp failed status:', updateError);
+    }
+    
     res.status(500).json({ error: 'Failed to send WhatsApp message' });
   }
 };
