@@ -51,7 +51,8 @@ const corsOptions = {
     'https://testresq.onrender.com',
     'https://testresq-1.onrender.com',
     'https://cartresq-frontend.onrender.com',
-    'https://cartresq-yiq2.onrender.com'
+    'https://cartresq-yiq2.onrender.com',
+    'https://cartresq.onrender.com'
     ];
     
     // Allow requests with no origin (like mobile apps, curl, postman)
