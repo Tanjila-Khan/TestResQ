@@ -7,11 +7,11 @@ const isDevelopment = process.env.NODE_ENV === 'development' ||
 const config = {
   // API URL - auto-detect based on environment
   apiBaseUrl: process.env.REACT_APP_API_URL || 
-               (isDevelopment ? 'http://localhost:3003' : 'https://api.cartresq.com'),
+               (isDevelopment ? 'http://localhost:3003' : 'https://cartresq-yiq2.onrender.com'),
   
   // WebSocket URL - auto-detect based on environment
   wsUrl: process.env.REACT_APP_WS_URL || 
-         (isDevelopment ? 'ws://localhost:3003' : 'wss://api.cartresq.com')
+         (isDevelopment ? 'ws://localhost:3003' : 'wss://cartresq-yiq2.onrender.com')
 };
 
 // Log the detected configuration for debugging
