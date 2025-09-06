@@ -20,6 +20,21 @@ import NotFound from './components/NotFound';
 import './App.css';
 import api from './utils/api';
 
+// Landing page component that redirects to the static landing.html
+function LandingPage() {
+  useEffect(() => {
+    window.location.href = '/landing.html';
+  }, []);
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Redirecting to landing page...</p>
+      </div>
+    </div>
+  );
+}
+
 function useAuthState() {
   const [authChecked, setAuthChecked] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -97,9 +112,9 @@ function SmartRedirect() {
     );
   }
   
-  // If not authenticated, redirect to login
+  // If not authenticated, redirect to landing page
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/landing" replace />;
   }
   
   // If authenticated but not subscribed, redirect to pricing
@@ -121,12 +136,12 @@ function ProtectedRoute({ children }) {
   const location = useLocation();
   if (!authChecked) return null;
 
-  // Not authenticated: only allow /login, /register, /reset-password
+  // Not authenticated: only allow /landing, /login, /register, /reset-password
   if (!isAuthenticated) {
-    if (["/login", "/register", "/reset-password"].includes(location.pathname)) {
+    if (["/landing", "/login", "/register", "/reset-password"].includes(location.pathname)) {
       return children;
     }
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/landing" replace />;
   }
 
   // Authenticated: block /login, /register, /reset-password
@@ -171,6 +186,7 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
+          <Route path="/landing" element={<LandingPage />} />
           <Route path="/login" element={<ProtectedRoute><AuthPage /></ProtectedRoute>} />
           <Route path="/register" element={<ProtectedRoute><AuthPage /></ProtectedRoute>} />
           <Route path="/reset-password" element={<ProtectedRoute><ResetPassword /></ProtectedRoute>} />
