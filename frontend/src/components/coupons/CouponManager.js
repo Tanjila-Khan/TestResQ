@@ -162,9 +162,22 @@ const CouponManager = () => {
       setValidationErrors(errors);
       return;
     }
+    
+    if (!selectedCoupon._id) {
+      setError('Invalid coupon ID');
+      return;
+    }
+    
     try {
       setLoading(true);
+      setError(null);
       const { platform, storeId } = getStoreParams();
+      
+      if (!storeId) {
+        setError("No store connected. Please connect your store to update coupons.");
+        return;
+      }
+      
       // Convert numeric fields to numbers and prevent empty strings
       const payload = {
         ...selectedCoupon,
@@ -175,9 +188,11 @@ const CouponManager = () => {
         platform,
         storeId,
       };
-      await api.put(`/api/coupons/${selectedCoupon.id}`, payload);
+      
+      await api.put(`/api/coupons/${selectedCoupon._id}`, payload);
       setShowEditModal(false);
-      fetchCoupons();
+      setValidationErrors({});
+      await fetchCoupons();
     } catch (err) {
       console.error("Error updating coupon:", err);
       setError(err.response?.data?.error || 'Failed to update coupon');
@@ -188,15 +203,28 @@ const CouponManager = () => {
 
   // Handle coupon deletion
   const handleDeleteCoupon = async () => {
+    if (!selectedCoupon._id) {
+      setError('Invalid coupon ID');
+      return;
+    }
+    
     try {
       setLoading(true);
+      setError(null);
       const { platform, storeId } = getStoreParams();
-      await api.delete(`/api/coupons/${selectedCoupon.id}`, {
+      
+      if (!storeId) {
+        setError("No store connected. Please connect your store to delete coupons.");
+        return;
+      }
+      
+      await api.delete(`/api/coupons/${selectedCoupon._id}`, {
         params: { platform, storeId }
       });
       setShowDeleteModal(false);
-      fetchCoupons();
+      await fetchCoupons();
     } catch (err) {
+      console.error("Error deleting coupon:", err);
       setError(err.response?.data?.error || 'Failed to delete coupon');
     } finally {
       setLoading(false);
@@ -345,6 +373,33 @@ const CouponManager = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Error Display */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Error</h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>{error}</p>
+                </div>
+                <div className="mt-3">
+                  <button
+                    onClick={() => setError(null)}
+                    className="text-sm font-medium text-red-800 hover:text-red-600"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="md:flex md:items-center md:justify-between mb-6">
           <div className="flex-1 min-w-0">
@@ -412,7 +467,8 @@ const CouponManager = () => {
                             setSelectedCoupon(coupon);
                             setShowEditModal(true);
                           }}
-                          className="text-blue-600 hover:text-blue-900"
+                          disabled={loading}
+                          className="text-blue-600 hover:text-blue-900 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Edit
                         </button>
@@ -421,13 +477,15 @@ const CouponManager = () => {
                             setSelectedCoupon(coupon);
                             setShowDeleteModal(true);
                           }}
-                          className="text-red-600 hover:text-red-900"
+                          disabled={loading}
+                          className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <TrashIcon className="h-5 w-5" />
                         </button>
                         <button
                           onClick={() => { setSelectedCoupon(coupon); setShowSendReminderModal(true); }}
-                          className="text-green-600 hover:text-green-900"
+                          disabled={loading}
+                          className="text-green-600 hover:text-green-900 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Send Discount Mail
                         </button>
@@ -634,7 +692,186 @@ const CouponManager = () => {
         {/* Edit Coupon Modal */}
         {showEditModal && selectedCoupon && (
           <div className="fixed inset-0 z-50 overflow-y-auto">
-            {/* ... Edit modal content ... */}
+            <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+              <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+              </div>
+              <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div>
+                  <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                    Edit Coupon: {selectedCoupon.code}
+                  </h3>
+                  <div className="space-y-4">
+                    {/* Coupon Code */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Coupon Code</label>
+                      <div className="mt-1 flex rounded-md shadow-sm">
+                        <input
+                          type="text"
+                          value={selectedCoupon.code}
+                          onChange={(e) => setSelectedCoupon(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
+                          className="flex-1 min-w-0 block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          placeholder="Enter coupon code"
+                        />
+                      </div>
+                      {validationErrors.code && (
+                        <p className="mt-1 text-sm text-red-600">{validationErrors.code}</p>
+                      )}
+                    </div>
+
+                    {/* Discount Type and Amount */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Discount Type</label>
+                        <select
+                          value={selectedCoupon.type}
+                          onChange={(e) => setSelectedCoupon(prev => ({ ...prev, type: e.target.value }))}
+                          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                        >
+                          <option value="percentage">Percentage</option>
+                          <option value="fixed">Fixed Amount</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          {selectedCoupon.type === 'percentage' ? 'Percentage' : 'Amount'}
+                        </label>
+                        <div className="mt-1 relative rounded-md shadow-sm">
+                          <input
+                            type="number"
+                            value={selectedCoupon.amount}
+                            onChange={(e) => setSelectedCoupon(prev => ({ ...prev, amount: e.target.value }))}
+                            className="block w-full pr-12 border-gray-300 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                            placeholder={selectedCoupon.type === 'percentage' ? 'Enter percentage' : 'Enter amount'}
+                          />
+                          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span className="text-gray-500 sm:text-sm">
+                              {selectedCoupon.type === 'percentage' ? '%' : '$'}
+                            </span>
+                          </div>
+                        </div>
+                        {validationErrors.amount && (
+                          <p className="mt-1 text-sm text-red-600">{validationErrors.amount}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Minimum Spend and Maximum Discount */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Minimum Spend</label>
+                        <div className="mt-1 relative rounded-md shadow-sm">
+                          <input
+                            type="number"
+                            value={selectedCoupon.minSpend || ''}
+                            onChange={(e) => setSelectedCoupon(prev => ({ ...prev, minSpend: e.target.value }))}
+                            className="block w-full pr-12 border-gray-300 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                            placeholder="Enter minimum spend"
+                          />
+                          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span className="text-gray-500 sm:text-sm">$</span>
+                          </div>
+                        </div>
+                        {validationErrors.minSpend && (
+                          <p className="mt-1 text-sm text-red-600">{validationErrors.minSpend}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Maximum Discount</label>
+                        <div className="mt-1 relative rounded-md shadow-sm">
+                          <input
+                            type="number"
+                            value={selectedCoupon.maxDiscount || ''}
+                            onChange={(e) => setSelectedCoupon(prev => ({ ...prev, maxDiscount: e.target.value }))}
+                            className="block w-full pr-12 border-gray-300 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                            placeholder="Enter maximum discount"
+                          />
+                          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span className="text-gray-500 sm:text-sm">$</span>
+                          </div>
+                        </div>
+                        {validationErrors.maxDiscount && (
+                          <p className="mt-1 text-sm text-red-600">{validationErrors.maxDiscount}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Date Range */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Start Date</label>
+                        <input
+                          type="datetime-local"
+                          value={selectedCoupon.startDate ? new Date(selectedCoupon.startDate).toISOString().slice(0, 16) : ''}
+                          onChange={(e) => setSelectedCoupon(prev => ({ ...prev, startDate: e.target.value }))}
+                          className="mt-1 block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                        />
+                        {validationErrors.startDate && (
+                          <p className="mt-1 text-sm text-red-600">{validationErrors.startDate}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">End Date</label>
+                        <input
+                          type="datetime-local"
+                          value={selectedCoupon.endDate ? new Date(selectedCoupon.endDate).toISOString().slice(0, 16) : ''}
+                          onChange={(e) => setSelectedCoupon(prev => ({ ...prev, endDate: e.target.value }))}
+                          className="mt-1 block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                        />
+                        {validationErrors.endDate && (
+                          <p className="mt-1 text-sm text-red-600">{validationErrors.endDate}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Usage Limit */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Usage Limit</label>
+                      <input
+                        type="number"
+                        value={selectedCoupon.usageLimit || ''}
+                        onChange={(e) => setSelectedCoupon(prev => ({ ...prev, usageLimit: e.target.value }))}
+                        className="mt-1 block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                        placeholder="Enter usage limit (leave empty for unlimited)"
+                      />
+                      {validationErrors.usageLimit && (
+                        <p className="mt-1 text-sm text-red-600">{validationErrors.usageLimit}</p>
+                      )}
+                    </div>
+
+                    {/* Active Status */}
+                    <div>
+                      <label className="inline-flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedCoupon.isActive}
+                          onChange={(e) => setSelectedCoupon(prev => ({ ...prev, isActive: e.target.checked }))}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Active</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                  <button
+                    type="button"
+                    onClick={handleUpdateCoupon}
+                    disabled={loading}
+                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? 'Updating...' : 'Update Coupon'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowEditModal(false)}
+                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:col-start-1 sm:text-sm"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -665,9 +902,10 @@ const CouponManager = () => {
                   <button
                     type="button"
                     onClick={handleDeleteCoupon}
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+                    disabled={loading}
+                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Delete
+                    {loading ? 'Deleting...' : 'Delete'}
                   </button>
                   <button
                     type="button"
