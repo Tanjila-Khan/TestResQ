@@ -1,5 +1,17 @@
 services:
   - type: web
+    name: cartresq-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/build
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    plan: free
+    autoDeploy: true
+
+  - type: web
     name: cartresq-backend
     env: node
     buildCommand: cd backend && npm install
@@ -9,11 +21,45 @@ services:
         sync: false
       - key: NODE_ENV
         value: production
-      - key: EMAIL_SERVICE
+      - key: JWT_SECRET
         sync: false
-      - key: EMAIL_USER
+      - key: FRONTEND_URL
+        value: https://cartresq-1.onrender.com
+      - key: ZOHO_EMAIL_USER
         sync: false
-      - key: EMAIL_PASS
+      - key: ZOHO_EMAIL
+        sync: false
+      - key: ZOHO_EMAIL_PASSWORD
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_STARTER_PRICE_ID
+        sync: false
+      - key: STRIPE_GROWTH_PRICE_ID
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_PHONE_NUMBER
+        sync: false
+      - key: TWILIO_SENDER_ID
+        sync: false
+      - key: USE_CUSTOM_SENDER
+        value: "false"
+      - key: STORE_URL
+        sync: false
+      - key: MAIL_HOST
+        sync: false
+      - key: MAIL_PORT
+        sync: false
+      - key: MAIL_SECURE
+        sync: false
+      - key: MAIL_USER
+        sync: false
+      - key: MAIL_PASS
         sync: false
     plan: free
     autoDeploy: true
@@ -22,17 +68,51 @@ services:
     name: cartresq-email-worker
     env: node
     buildCommand: cd backend && npm install
-    startCommand: cd backend/worker && npm install && npm start
+    startCommand: cd backend && node worker.js
     envVars:
       - key: MONGODB_URI
         sync: false
       - key: NODE_ENV
         value: production
-      - key: EMAIL_SERVICE
+      - key: JWT_SECRET
         sync: false
-      - key: EMAIL_USER
+      - key: FRONTEND_URL
+        value: https://cartresq-1.onrender.com
+      - key: ZOHO_EMAIL_USER
         sync: false
-      - key: EMAIL_PASS
+      - key: ZOHO_EMAIL
+        sync: false
+      - key: ZOHO_EMAIL_PASSWORD
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_STARTER_PRICE_ID
+        sync: false
+      - key: STRIPE_GROWTH_PRICE_ID
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_PHONE_NUMBER
+        sync: false
+      - key: TWILIO_SENDER_ID
+        sync: false
+      - key: USE_CUSTOM_SENDER
+        value: "false"
+      - key: STORE_URL
+        sync: false
+      - key: MAIL_HOST
+        sync: false
+      - key: MAIL_PORT
+        sync: false
+      - key: MAIL_SECURE
+        sync: false
+      - key: MAIL_USER
+        sync: false
+      - key: MAIL_PASS
         sync: false
     plan: free
     autoDeploy: true 
